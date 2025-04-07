@@ -1,40 +1,40 @@
-name: Nodejs CI & Docker Deploy
+name: CI/CD for Node.js with Docker
 
 on:
+  push:
+    branches: [main]
   release:
     types: [created]
 
 jobs:
-  build-and-deploy:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🛠 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: 📦 Install Dependencies
         run: npm ci
 
-      - name: Run tests
+      - name: ✅ Run Tests
         run: npm test
 
-      - name: Log in to Docker Hub
+      - name: 🔐 Docker Login
         env:
-            DOCKERHUB_USERNAME: bhim78
-            DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t bhim78/node-app:${{ github.sha }} .
+      - name: 🏗️ Build Docker Image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-app:${{ github.sha }} .
 
-      - name: Push Docker image to Docker Hub
-        run: docker push bhim78/node-app:${{ github.sha }}
-
-      - name: Run Docker container (for test)
-        run: |
-          docker run -d --name node-app -p 3000:3000 bhim78/node-app:${{ github.sha }}
+      - name: 📤 Push Docker Image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-app:${{ github.sha }}
+      - name: 🚀 Run Docker Container (for test)
+        run: docker run -d -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/node-app:${{ github.sha }}
