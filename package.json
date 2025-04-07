@@ -4,8 +4,8 @@
   "description": "Research about a person",
   "main": "index.js",
  "scripts": {
-  "test": "echo \"No tests yet. Skipping...\""
-},
+  "start": "node index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rat9615/simple-nodejs-app.git"
